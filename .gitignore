@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment secrets — NEVER commit these
+.env
+.env.local
+.env*.local
+
+# MCP config contains service role keys — NEVER commit
+.cursor/mcp.json
+mcp.json
+.mcp.json
+
+# Supabase local
+supabase/.temp/
+.supabase/
+
+# Next.js
+.next/
+out/
+
+# Vercel
+.vercel/
+
+# Misc
+.DS_Store
+*.pem
