@@ -25,3 +25,4 @@ out/
 # Misc
 .DS_Store
 *.pem
+.vercel
