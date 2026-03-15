@@ -32,7 +32,7 @@
 - **Framework:** Next.js 14 (App Router) — server components by default, client components marked `'use client'`
 - **Database + Auth:** Supabase
 - **Deployment:** Vercel — auto-deploys main + PR previews
-- **AI:** Claude claude-sonnet-4-20250514 — word card generation
+- **AI:** claude-sonnet-4-20250514 — word card generation
 - **Styling:** Tailwind CSS
 
 ---
