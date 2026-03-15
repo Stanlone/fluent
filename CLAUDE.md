@@ -37,7 +37,7 @@ If you ever see a secret value in any `.md` file, stop immediately and flag it b
 
 ## What This Product Is
 
-[FILL IN — one paragraph. What the product does, who it is for, what it must feel like. Include any key distinctions between user types if there are multiple.]
+Fluent is a personal word intelligence system for a C1 English speaker with Russian as a native language. It captures words from any context, generates deep word cards (Russian nuance explanation, English usage rules, synonym map, etymology, real examples), and trains retention via spaced repetition. Built for one user who wants depth, not drills.
 
 ---
 
@@ -46,18 +46,18 @@ If you ever see a secret value in any `.md` file, stop immediately and flag it b
 - **Framework:** Next.js 14 (App Router) — server components by default, client components marked `'use client'`
 - **Database + Auth:** Supabase
 - **Deployment:** Vercel — auto-deploys main + PR previews
-- **AI:** [FILL IN — model name, what it is used for]
+- **AI:** Claude claude-sonnet-4-20250514 — used to generate all word card content: Russian nuance definitions, English usage explanations, synonym maps with distinctions, etymology, and contextual example sentences.
 - **Styling:** Tailwind CSS
 
 ### Auth Pattern
-[FILL IN — how users are identified, role system, where roles are stored]
+Single user. Supabase Auth with email/password. No roles — one account only.
 
 ### Environment Variables (names only — values in .env.local and Vercel dashboard)
 ```
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
-[FILL IN — any additional env vars for this project]
+ANTHROPIC_API_KEY
 ```
 
 ---
@@ -66,39 +66,47 @@ SUPABASE_SERVICE_ROLE_KEY
 
 | Element | Value |
 |---|---|
-| Background | [FILL IN e.g. `#F9F7F4`] |
-| Primary text | [FILL IN e.g. `#1A1A1A`] |
-| Primary accent | [FILL IN e.g. `#6366F1`] |
-| Secondary accent | [FILL IN — if any] |
-| Layout | [FILL IN e.g. `max-w-2xl mx-auto px-6`] |
-| Font | [FILL IN e.g. Inter] |
-| Dark / light mode | [FILL IN] |
+| Background | `#FAF9F7` |
+| Primary text | `#1A1A1A` |
+| Primary accent | `#DA7756` |
+| Secondary accent | `#E8E3DC` |
+| Layout | `max-w-2xl mx-auto px-6` |
+| Font | Inter |
+| Dark / light mode | Light only |
 
-[FILL IN — rules about when colours appear, what they mean, what is off-limits]
+Accent `#DA7756` for interactive elements and highlights only. `#E8E3DC` for subtle backgrounds and borders. Never use accent as background. No dark mode in MVP.
 
 ---
 
 ## Navigation Conventions
 
-[FILL IN — e.g. never use `useRouter()`, always use plain `<a href>` tags or `window.location.href`]
+Always use plain `<a href>` tags or `window.location.href`. Never use `useRouter()`.
 
 ---
 
 ## Role Check Pattern
 
-[FILL IN — how to check user role safely, with fallback]
+Single user — no roles. Authenticate via Supabase Auth `auth.uid()`. If no session, redirect to login. No role checks needed.
 
 ---
 
 ## Key Patterns & Conventions
 
-[FILL IN — recurring patterns specific to this project that Code must always follow]
+All Claude API calls go through a single server-side route handler at `app/api/generate/route.ts`. Never call the Anthropic API from client components.
 
 ---
 
 ## Database Tables
 
-[FILL IN — one entry per table, listing all columns with types and notes]
+**users** — `id` (uuid, PK, default `uuid_generate_v4()`), `email` (text, unique, not null), `created_at` (timestamptz, default `now()`)
+
+**user_preferences** — `id` (uuid, PK, default `uuid_generate_v4()`), `user_id` (uuid, FK → users, not null), `topics` (text[], default `{}`), `sources` (text[], default `{}`), `notification_enabled` (bool, default false), `notification_time` (time, default `'09:00'`)
+
+**words** — `id` (uuid, PK, default `uuid_generate_v4()`), `user_id` (uuid, FK → users, not null), `word` (text, not null), `context` (text), `russian_definition` (text), `english_definition` (text), `synonyms` (jsonb), `etymology` (text), `created_at` (timestamptz, default `now()`)
+
+**reviews** — `id` (uuid, PK, default `uuid_generate_v4()`), `user_id` (uuid, FK → users, not null), `word_id` (uuid, FK → words, not null), `ease_factor` (float, default 2.5), `interval_days` (int, default 1), `repetitions` (int, default 0), `next_review_at` (timestamptz, default `now()`), `last_reviewed_at` (timestamptz)
+
+All tables have RLS enabled. Policies restrict access to `auth.uid() = user_id` (or `auth.uid() = id` for users table).
 
 ---
 
@@ -163,12 +171,13 @@ chore: maintenance, dependency updates, no user-facing change
 
 ## Key File Map
 
-[FILL IN as files are created — list important files and what each does. Update this section whenever a file is added, renamed, or deleted.]
-
 ```
 app/
   layout.tsx          — root layout
-  page.tsx            — [FILL IN]
+  page.tsx            — home / word library
+  api/
+    generate/
+      route.ts        — server-side Claude API handler
 lib/
   supabase/           — Supabase client helpers
 ```
@@ -177,6 +186,6 @@ lib/
 
 ## Before You Finish Any Task
 
-Ask yourself: **"[FILL IN — the guiding question for this product's users]"**
+Ask yourself: **"Would a C1 speaker find this useful or would they find it condescending?"**
 
 If the answer is no, or if you're unsure — stop and flag it.
