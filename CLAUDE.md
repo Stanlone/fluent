@@ -174,7 +174,10 @@ chore: maintenance, dependency updates, no user-facing change
 ```
 app/
   layout.tsx          — root layout
-  page.tsx            — home / word library
+  page.tsx            — home / word input + card display
+  globals.css         — global styles, visual system colors
+  components/
+    WordCard.tsx      — word card display component
   api/
     generate/
       route.ts        — server-side Claude API handler
