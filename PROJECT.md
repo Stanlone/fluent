@@ -8,10 +8,10 @@
 ### Completed ✓
 - Filled CLAUDE.md and PROJECT.md with product brief, visual system, DB schema, and conventions
 - Created initial DB schema migration (users, user_preferences, words, reviews with RLS)
+- Built server-side Claude API route for word card generation (`app/api/generate/route.ts`)
 
 ### Pending — first session
 - Chrome extension: highlight word → create card
-- Card generator via Claude API
 - Card library in web app (list view)
 - Basic spaced repetition review flow
 - Mobile-friendly PWA layout
@@ -73,3 +73,6 @@ All tables have RLS enabled with policies restricting access to `auth.uid()`.
 - Filled all [FILL IN] placeholders in CLAUDE.md (product description, AI stack, auth pattern, env vars, visual system, navigation, role check, key patterns, DB tables, key file map, guiding question)
 - Filled all [FILL IN] placeholders in PROJECT.md (who this is for, what this must never do, build status, DB schema)
 - Created initial DB schema migration: `supabase/migrations/20260315000000_initial_schema.sql`
+
+### 2026-03-19
+- Added `app/api/generate/route.ts` — POST route that takes `{ word, context }`, calls Claude claude-sonnet-4-20250514, returns structured word card JSON (pronunciation, synonyms, etymology, examples, Russian/English definitions)
