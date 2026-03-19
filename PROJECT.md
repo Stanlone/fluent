@@ -9,6 +9,7 @@
 - Filled CLAUDE.md and PROJECT.md with product brief, visual system, DB schema, and conventions
 - Created initial DB schema migration (users, user_preferences, words, reviews with RLS)
 - Built server-side Claude API route for word card generation (`app/api/generate/route.ts`)
+- Built word input screen and word card display UI (`app/page.tsx`, `app/components/WordCard.tsx`)
 
 ### Pending — first session
 - Chrome extension: highlight word → create card
@@ -76,3 +77,7 @@ All tables have RLS enabled with policies restricting access to `auth.uid()`.
 
 ### 2026-03-19
 - Added `app/api/generate/route.ts` — POST route that takes `{ word, context }`, calls Claude claude-sonnet-4-20250514, returns structured word card JSON (pronunciation, synonyms, etymology, examples, Russian/English definitions)
+- Built word input screen (`app/page.tsx`) — word input + optional context, calls /api/generate, displays word card
+- Created `app/components/WordCard.tsx` — renders full word card (pronunciation with Web Speech API, Russian/English definitions, examples, synonyms, etymology, word family)
+- Updated `app/layout.tsx` with Inter font and project metadata
+- Updated `app/globals.css` with project visual system colors (#FAF9F7, #DA7756, #E8E3DC)
