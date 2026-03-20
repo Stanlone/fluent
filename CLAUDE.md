@@ -27,8 +27,6 @@ NEXT_PUBLIC_SUPABASE_URL         ← name only, no value here
 NEXT_PUBLIC_SUPABASE_ANON_KEY    ← name only, no value here
 SUPABASE_SERVICE_ROLE_KEY        ← name only, no value here
 ANTHROPIC_API_KEY                ← name only, no value here
-AUTH_USERNAME                    ← name only, no value here
-AUTH_EMAIL                       ← name only, no value here
 ```
 
 Values live in `.env.local` (local dev) and Vercel dashboard (production). Nowhere else.
@@ -60,8 +58,6 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 ANTHROPIC_API_KEY
-AUTH_USERNAME
-AUTH_EMAIL
 ```
 
 ---
@@ -102,7 +98,7 @@ All Claude API calls go through a single server-side route handler at `app/api/g
 
 ## Database Tables
 
-**users** — `id` (uuid, PK, default `uuid_generate_v4()`), `email` (text, unique, not null), `created_at` (timestamptz, default `now()`)
+**users** — `id` (uuid, PK, default `uuid_generate_v4()`), `email` (text, unique, not null), `username` (text, unique), `created_at` (timestamptz, default `now()`)
 
 **user_preferences** — `id` (uuid, PK, default `uuid_generate_v4()`), `user_id` (uuid, FK → users, not null), `topics` (text[], default `{}`), `sources` (text[], default `{}`), `notification_enabled` (bool, default false), `notification_time` (time, default `'09:00'`)
 
@@ -181,19 +177,26 @@ app/
   layout.tsx            — root layout
   page.tsx              — home / word input + card display
   globals.css           — global styles, visual system colors
+  setup/
+    page.tsx            — one-time setup page (create account)
   login/
     page.tsx            — login page (username + password)
   components/
     WordCard.tsx        — word card display component
   api/
     auth/
+      setup-status/
+        route.ts        — GET: checks if a user account exists
+      setup/
+        route.ts        — POST: one-time account creation
       login/
-        route.ts        — server-side login handler
+        route.ts        — POST: username-based login handler
     generate/
       route.ts          — server-side Claude API handler
 lib/
   supabase/
     server.ts           — Supabase server client helper (@supabase/ssr)
+    admin.ts            — Supabase admin client helper (service role key)
 ```
 
 ---

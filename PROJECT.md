@@ -11,7 +11,7 @@
 - Built server-side Claude API route for word card generation (`app/api/generate/route.ts`)
 - Built word input screen and word card display UI (`app/page.tsx`, `app/components/WordCard.tsx`)
 - Fixed production 404 by adding `vercel.json` with `"framework": "nextjs"` (Vercel project had no framework preset detected)
-- Added email/password auth: login page with username field, server-side login API route, middleware session gate on `/` and `/api/generate`, session check in generate route
+- Replaced env-var auth with username-based auth: one-time setup page (`/setup`), username-based login (`/login`), setup-status and setup API routes, login route looks up username in DB, middleware session gate on `/` and `/api/generate`
 
 ### Pending — first session
 - Chrome extension: highlight word → create card
@@ -58,7 +58,7 @@ Single user. C1 English speaker, native Russian. Advanced learner who wants dept
 
 ## Database Schema
 
-**users** — `id` (uuid, PK), `email` (text, unique), `created_at` (timestamptz)
+**users** — `id` (uuid, PK), `email` (text, unique), `username` (text, unique), `created_at` (timestamptz)
 
 **user_preferences** — `id` (uuid, PK), `user_id` (uuid, FK → users), `topics` (text[]), `sources` (text[]), `notification_enabled` (bool, default false), `notification_time` (time, default '09:00')
 
@@ -88,8 +88,13 @@ All tables have RLS enabled with policies restricting access to `auth.uid()`.
 - Added `vercel.json` with `"framework": "nextjs"` — Vercel project had `framework: null`, causing the routing layer to not use the `@vercel/next` builder, resulting in 404 on all pages despite successful builds
 
 ### 2026-03-21
-- Added `app/login/page.tsx` — login page with username + password fields, posts to `/api/auth/login`, redirects to `/` on success
-- Added `app/api/auth/login/route.ts` — server-side login handler, validates username against `AUTH_USERNAME` env var, resolves email from `AUTH_EMAIL`, calls Supabase `signInWithPassword`, sets session cookies via `@supabase/ssr`
-- Added `middleware.ts` — session gate on `/` and `/api/generate`, redirects unauthenticated requests to `/login`
-- Added `lib/supabase/server.ts` — shared Supabase server client helper using `@supabase/ssr` with cookie handling
-- Updated `app/api/generate/route.ts` — added session check at top of POST handler (returns 401 if no valid session)
+- Replaced env-var auth (AUTH_USERNAME / AUTH_EMAIL) with username-based auth using Supabase Auth + users table
+- Added `app/setup/page.tsx` — one-time setup page, creates account via POST `/api/auth/setup`, locks itself when a user already exists
+- Added `app/api/auth/setup-status/route.ts` — GET handler, returns whether a user account exists
+- Added `app/api/auth/setup/route.ts` — POST handler, creates Supabase Auth user + users row, derives email as `{username}@fluent.local`
+- Rewrote `app/api/auth/login/route.ts` — looks up username in users table, signs in via Supabase Auth with resolved email
+- Added `lib/supabase/admin.ts` — Supabase admin client helper (service role key, no cookies)
+- `middleware.ts` — unchanged (session gate on `/` and `/api/generate`)
+- `app/api/generate/route.ts` — unchanged (session check at top of POST handler)
+- Removed `AUTH_USERNAME` and `AUTH_EMAIL` env vars — no longer needed
+- DB change required: `ALTER TABLE users ADD COLUMN username text unique;`
