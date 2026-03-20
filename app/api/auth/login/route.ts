@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
   let body: { username?: string; password?: string };
@@ -11,7 +12,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  if (body.username !== process.env.AUTH_USERNAME) {
+  const username = body.username?.trim().toLowerCase();
+  const password = body.password;
+
+  if (!username || !password) {
+    return NextResponse.json(
+      { error: "Invalid credentials" },
+      { status: 401 }
+    );
+  }
+
+  const admin = createAdminClient();
+
+  const { data: row, error: lookupError } = await admin
+    .from("users")
+    .select("email")
+    .eq("username", username)
+    .single();
+
+  if (lookupError || !row) {
     return NextResponse.json(
       { error: "Invalid credentials" },
       { status: 401 }
@@ -22,7 +41,7 @@ export async function POST(request: Request) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -38,8 +57,8 @@ export async function POST(request: Request) {
   );
 
   const { error } = await supabase.auth.signInWithPassword({
-    email: process.env.AUTH_EMAIL!,
-    password: body.password!,
+    email: row.email,
+    password,
   });
 
   if (error) {
