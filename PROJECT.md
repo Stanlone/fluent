@@ -10,6 +10,7 @@
 - Created initial DB schema migration (users, user_preferences, words, reviews with RLS)
 - Built server-side Claude API route for word card generation (`app/api/generate/route.ts`)
 - Built word input screen and word card display UI (`app/page.tsx`, `app/components/WordCard.tsx`)
+- Fixed production 404 by adding `vercel.json` with `"framework": "nextjs"` (Vercel project had no framework preset detected)
 
 ### Pending — first session
 - Chrome extension: highlight word → create card
@@ -81,3 +82,6 @@ All tables have RLS enabled with policies restricting access to `auth.uid()`.
 - Created `app/components/WordCard.tsx` — renders full word card (pronunciation with Web Speech API, Russian/English definitions, examples, synonyms, etymology, word family)
 - Updated `app/layout.tsx` with Inter font and project metadata
 - Updated `app/globals.css` with project visual system colors (#FAF9F7, #DA7756, #E8E3DC)
+
+### 2026-03-20
+- Added `vercel.json` with `"framework": "nextjs"` — Vercel project had `framework: null`, causing the routing layer to not use the `@vercel/next` builder, resulting in 404 on all pages despite successful builds
