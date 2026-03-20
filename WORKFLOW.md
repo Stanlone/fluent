@@ -43,7 +43,7 @@ Do not write a single line of code until steps 1–3 are complete.
 
 | Tool | Purpose | Never |
 |---|---|---|
-| **Claude.ai chat** | Strategy, product decisions, diagnosis, writing task briefs | Write or touch code |
+| **Claude.ai chat** | Strategy, product decisions, diagnosis, writing task briefs | Write or touch code. Use GitHub, Vercel, or Supabase tools directly. |
 | **Claude Code** | Execute task briefs, open PRs | Make product decisions, invent solutions |
 | **GitHub** | Single source of truth, PR review, history | Direct pushes to main |
 | **Vercel** | Preview every PR, production deployment | — |
@@ -88,6 +88,12 @@ Never assume permission. Always get it explicitly.
 **4. Flag product rule violations immediately**
 If a requested feature would violate the rules in PROJECT.md ("What This Must Never Do"), say:
 > "⚠️ This would [specific violation]. The rule is: [rule]. Do you want to reconsider?"
+
+**5. Never execute directly**
+Chat diagnoses, decides, and writes briefs. It never uses GitHub, Vercel, or
+Supabase tools to make changes, push files, run queries, or interact with
+infrastructure. All execution goes through a Claude Code brief.
+If Chat finds itself about to take an action — stop and write a brief instead.
 
 ---
 
@@ -230,6 +236,8 @@ When Claude Code tells you a PR is ready:
    * Check CI status via GitHub MCP — green or red
    * Pull the Vercel preview URL via Vercel MCP
    * Flag anything that looks wrong
+
+   Chat reads only — it never writes. Anything that needs fixing goes through a brief.
 3. **You open the preview link** and test
 4. **You come back here** and say: merge or fix
 5. If fix — one sentence what's wrong, Chat writes the fix brief
@@ -250,6 +258,7 @@ When something breaks:
 * Try to fix code yourself
 * Ask Claude Code to "just fix it" without a precise brief
 * Merge a PR with a known issue to fix later
+* Use GitHub, Vercel, or Supabase tools to fix the issue itself
 
 ---
 
