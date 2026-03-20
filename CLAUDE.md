@@ -27,6 +27,8 @@ NEXT_PUBLIC_SUPABASE_URL         ← name only, no value here
 NEXT_PUBLIC_SUPABASE_ANON_KEY    ← name only, no value here
 SUPABASE_SERVICE_ROLE_KEY        ← name only, no value here
 ANTHROPIC_API_KEY                ← name only, no value here
+AUTH_USERNAME                    ← name only, no value here
+AUTH_EMAIL                       ← name only, no value here
 ```
 
 Values live in `.env.local` (local dev) and Vercel dashboard (production). Nowhere else.
@@ -58,6 +60,8 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 ANTHROPIC_API_KEY
+AUTH_USERNAME
+AUTH_EMAIL
 ```
 
 ---
@@ -172,17 +176,24 @@ chore: maintenance, dependency updates, no user-facing change
 ## Key File Map
 
 ```
+middleware.ts           — session gate (redirects unauthenticated to /login)
 app/
-  layout.tsx          — root layout
-  page.tsx            — home / word input + card display
-  globals.css         — global styles, visual system colors
+  layout.tsx            — root layout
+  page.tsx              — home / word input + card display
+  globals.css           — global styles, visual system colors
+  login/
+    page.tsx            — login page (username + password)
   components/
-    WordCard.tsx      — word card display component
+    WordCard.tsx        — word card display component
   api/
+    auth/
+      login/
+        route.ts        — server-side login handler
     generate/
-      route.ts        — server-side Claude API handler
+      route.ts          — server-side Claude API handler
 lib/
-  supabase/           — Supabase client helpers
+  supabase/
+    server.ts           — Supabase server client helper (@supabase/ssr)
 ```
 
 ---

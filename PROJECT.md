@@ -11,6 +11,7 @@
 - Built server-side Claude API route for word card generation (`app/api/generate/route.ts`)
 - Built word input screen and word card display UI (`app/page.tsx`, `app/components/WordCard.tsx`)
 - Fixed production 404 by adding `vercel.json` with `"framework": "nextjs"` (Vercel project had no framework preset detected)
+- Added email/password auth: login page with username field, server-side login API route, middleware session gate on `/` and `/api/generate`, session check in generate route
 
 ### Pending — first session
 - Chrome extension: highlight word → create card
@@ -85,3 +86,10 @@ All tables have RLS enabled with policies restricting access to `auth.uid()`.
 
 ### 2026-03-20
 - Added `vercel.json` with `"framework": "nextjs"` — Vercel project had `framework: null`, causing the routing layer to not use the `@vercel/next` builder, resulting in 404 on all pages despite successful builds
+
+### 2026-03-21
+- Added `app/login/page.tsx` — login page with username + password fields, posts to `/api/auth/login`, redirects to `/` on success
+- Added `app/api/auth/login/route.ts` — server-side login handler, validates username against `AUTH_USERNAME` env var, resolves email from `AUTH_EMAIL`, calls Supabase `signInWithPassword`, sets session cookies via `@supabase/ssr`
+- Added `middleware.ts` — session gate on `/` and `/api/generate`, redirects unauthenticated requests to `/login`
+- Added `lib/supabase/server.ts` — shared Supabase server client helper using `@supabase/ssr` with cookie handling
+- Updated `app/api/generate/route.ts` — added session check at top of POST handler (returns 401 if no valid session)
